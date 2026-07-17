@@ -1,4 +1,6 @@
 using SmsBridge.Desktop.Components;
+using SmsBridge.Desktop.Contracts;
+using SmsBridge.Desktop.Models;
 using SmsBridge.Desktop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,40 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+app.MapPost("/api/messages",
+    (IncomingMessageRequest request, IMessageStore messageStore) =>
+    {
+        Dictionary<string, string[]> errors = [];
+
+        if (string.IsNullOrWhiteSpace(request.Sender))
+        {
+            errors["sender"] = ["Sender is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+        {
+            errors["body"] = ["Message Body is required."];
+        }
+
+        if(errors.Count > 0)
+        {
+            return Results.ValidationProblem(errors);
+        }
+
+        SmsMessage message = new()
+        {
+            Sender = request.Sender.Trim(),
+            Body = request.Body.Trim(),
+            ReceivedAt = request.ReceivedAt ?? DateTime.Now
+        };
+
+        messageStore.AddMessage(message);
+
+        return Results.Created("/api/messages", message);
+
+    });
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

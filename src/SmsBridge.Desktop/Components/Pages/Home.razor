@@ -17,10 +17,6 @@
         <div class="connection-status">
             <span class="status-dot"></span>
             Demo mode
-            <button class="test-message-button"
-                    @onclick="AddTestMessage">
-                Add test message
-            </button>
         </div>
         
     </header>
@@ -55,15 +51,4 @@
         MessageStore.MessageReceived -= HandleMessageReceived;
     }
 
-    private int _testMessageNumber = 1;
-
-    private void AddTestMessage()
-    {
-        MessageStore.AddMessage(new SmsMessage
-        {
-            Sender = "Test sender",
-            Body = $"Test message #{_testMessageNumber++}",
-            ReceivedAt = DateTime.Now
-        });
-    }
 }
