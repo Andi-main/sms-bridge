@@ -1,7 +1,53 @@
 ﻿@page "/"
+@using SmsBridge.Desktop.Models
 
-<PageTitle>Home</PageTitle>
+<PageTitle>SMS Bridge</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="sms-page">
+    <header class="page-header">
+        <div>
+            <h1>SMS Bridge</h1>
+            <p>Wiadomości z Twojego Telefonu</p>
+        </div>
 
-Welcome to your new app.
+        <div class="connection-status">
+            <span class="status-dot"></span>
+            Tryb Demonstracyjny
+        </div>
+    </header>
+
+    <main class="message-list">
+        @foreach (SmsMessage message in messages.OrderByDescending(message => message.ReceivedAt))
+        {
+            <article class="message-card">
+                <div class="message-header">
+                    <strong>@message.Sender</strong>
+                    <time>@message.ReceivedAt.ToString("HH:mm")</time>
+                </div>
+
+                <p>@message.Body</p>
+            </article>
+        }
+    </main>
+</div>
+
+@code{
+    private readonly List<SmsMessage> messages =
+    [
+        new SmsMessage{
+        Sender = "Mama",
+        Body = "Kup proszę mleko po drodze.",
+        ReceivedAt = DateTime.Today.AddHours(13).AddMinutes(12)
+        },
+        new SmsMessage{
+        Sender = "+48 123 456 789",
+        Body = "Twój kod odbioru przesyłki to: xyz",
+        ReceivedAt = DateTime.Today.AddHours(11).AddMinutes(10)
+        },
+        new SmsMessage{
+        Sender = "Wiktoria",
+        Body = "Jestem Góralcio :3",
+        ReceivedAt = DateTime.Today.AddHours(8).AddMinutes(37)
+        },
+    ];
+}
