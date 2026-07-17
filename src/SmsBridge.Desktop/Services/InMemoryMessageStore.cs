@@ -25,4 +25,11 @@ public sealed class InMemoryMessageStore : IMessageStore
     {
         return _messages;
     }
+
+    public void AddMessage(SmsMessage message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        _messages.Add(message);
+    }
 }

@@ -2,6 +2,7 @@
 @using SmsBridge.Desktop.Models
 @using SmsBridge.Desktop.Services
 @inject IMessageStore MessageStore
+@rendermode InteractiveServer
 
 <PageTitle>SMS Bridge</PageTitle>
 
@@ -15,7 +16,12 @@
         <div class="connection-status">
             <span class="status-dot"></span>
             Demo mode
+            <button class="test-message-button"
+                    @onclick="AddTestMessage">
+                Add test message
+            </button>
         </div>
+        
     </header>
 
     <main class="message-list">
@@ -33,3 +39,16 @@
     </main>
 </div>
 
+@code {
+    private int _testMessageNumber = 1;
+
+    private void AddTestMessage()
+    {
+        MessageStore.AddMessage(new SmsMessage
+        {
+            Sender = "Test sender",
+            Body = $"Test message #{_testMessageNumber++}",
+            ReceivedAt = DateTime.Now
+        });
+    }
+}
