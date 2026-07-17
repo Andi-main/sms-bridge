@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmsBridge.Desktop/SmsBridge.Desktop.csproj" />
+  </Folder>
+</Solution>
