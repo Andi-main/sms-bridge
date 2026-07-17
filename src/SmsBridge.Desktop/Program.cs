@@ -29,27 +29,30 @@ app.MapStaticAssets();
 app.MapPost("/api/messages",
     (IncomingMessageRequest request, IMessageStore messageStore) =>
     {
+        string sender = request.Sender?.Trim() ?? string.Empty;
+        string body = request.Body?.Trim() ?? string.Empty;
+
         Dictionary<string, string[]> errors = [];
 
-        if (string.IsNullOrWhiteSpace(request.Sender))
+        if (sender.Length == 0)
         {
             errors["sender"] = ["Sender is required."];
         }
 
-        if (string.IsNullOrWhiteSpace(request.Body))
+        if (body.Length == 0)
         {
-            errors["body"] = ["Message Body is required."];
+            errors["body"] = ["Message body is required."];
         }
 
-        if(errors.Count > 0)
+        if (errors.Count > 0)
         {
             return Results.ValidationProblem(errors);
         }
 
         SmsMessage message = new()
         {
-            Sender = request.Sender.Trim(),
-            Body = request.Body.Trim(),
+            Sender = sender,
+            Body = body,
             ReceivedAt = request.ReceivedAt ?? DateTime.Now
         };
 
