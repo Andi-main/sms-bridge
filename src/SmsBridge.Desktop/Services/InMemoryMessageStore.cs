@@ -3,6 +3,10 @@ namespace SmsBridge.Desktop.Services;
 
 public sealed class InMemoryMessageStore : IMessageStore
 {
+    private readonly object _syncRoot = new();
+
+    public event Action<SmsMessage>? MessageReceived; 
+
     private readonly List<SmsMessage> _messages =
     [
         new SmsMessage{
@@ -23,13 +27,21 @@ public sealed class InMemoryMessageStore : IMessageStore
     ];
     public IReadOnlyList<SmsMessage> GetMessages()
     {
-        return _messages;
+        lock (_syncRoot)
+        {
+            return _messages.ToArray();
+        }
     }
 
     public void AddMessage(SmsMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        _messages.Add(message);
+        lock (_syncRoot)
+        {
+            _messages.Add(message);
+        }
+
+        MessageReceived?.Invoke(message);
     }
 }

@@ -3,6 +3,7 @@
 @using SmsBridge.Desktop.Services
 @inject IMessageStore MessageStore
 @rendermode InteractiveServer
+@implements IDisposable
 
 <PageTitle>SMS Bridge</PageTitle>
 
@@ -40,6 +41,20 @@
 </div>
 
 @code {
+    protected override void OnInitialized()
+    {
+        MessageStore.MessageReceived += HandleMessageReceived;
+    }
+
+    private void HandleMessageReceived(SmsMessage message)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+    public void Dispose()
+    {
+        MessageStore.MessageReceived -= HandleMessageReceived;
+    }
+
     private int _testMessageNumber = 1;
 
     private void AddTestMessage()
