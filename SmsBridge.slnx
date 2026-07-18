@@ -2,5 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/SmsBridge.Desktop/SmsBridge.Desktop.csproj" />
     <Project Path="src/SmsBridge.Relay/SmsBridge.Relay.csproj" />
+    <Project Path="src/SmsBridge.Shared/SmsBridge.Shared.csproj" />
   </Folder>
 </Solution>
