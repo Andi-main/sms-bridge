@@ -10,6 +10,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSingleton<IMessageStore, InMemoryMessageStore>();
 
+builder.Services.AddSingleton<RelayConnectionService>();
+
+builder.Services.AddHostedService(serviceProvider =>
+    serviceProvider.GetRequiredService<RelayConnectionService>());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
