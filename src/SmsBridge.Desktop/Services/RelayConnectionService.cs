@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using SmsBridge.Desktop.Models;
 using SmsBridge.Shared.Messages;
-
+using System.Text.Json;
+using SmsBridge.Desktop.Contracts;
 namespace SmsBridge.Desktop.Services;
 
 public sealed class RelayConnectionService : BackgroundService, IAsyncDisposable
@@ -110,14 +111,45 @@ public sealed class RelayConnectionService : BackgroundService, IAsyncDisposable
     }
 
     private void HandleMessageReceived(
-        RelayMessageEnvelope envelope)
+    RelayMessageEnvelope envelope)
     {
-        _messageStore.AddMessage(new SmsMessage
+        try
         {
-            Sender = "Relay",
-            Body = envelope.Payload,
-            ReceivedAt = envelope.SentAt.LocalDateTime
-        });
+            SmsPayload? payload =
+                JsonSerializer.Deserialize<SmsPayload>(
+                    envelope.Payload);
+
+            string sender =
+                payload?.Sender?.Trim()
+                ?? string.Empty;
+
+            string body =
+                payload?.Body?.Trim()
+                ?? string.Empty;
+
+            if (sender.Length == 0 || body.Length == 0)
+            {
+                _logger.LogWarning(
+                    "Received an invalid SMS payload from Relay.");
+
+                return;
+            }
+
+            _messageStore.AddMessage(new SmsMessage
+            {
+                Sender = sender,
+                Body = body,
+                ReceivedAt =
+                    payload?.ReceivedAt?.LocalDateTime
+                    ?? envelope.SentAt.LocalDateTime
+            });
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogWarning(
+                exception,
+                "Received malformed JSON payload from Relay.");
+        }
     }
 
     public async ValueTask DisposeAsync()

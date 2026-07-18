@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-
+using System.Text.Json;
+using SmsBridge.Simulator.Models;
 using SmsBridge.Shared.Messages;
 
 string relayBaseUrl =
@@ -60,19 +61,31 @@ try
 
     while (true)
     {
-        Console.Write("Message: ");
+        Console.Write("Sender: ");
 
-        string messageBody =
+        string sender =
             Console.ReadLine()?.Trim()
             ?? string.Empty;
 
         if (string.Equals(
-                messageBody,
+                sender,
                 "/exit",
                 StringComparison.OrdinalIgnoreCase))
         {
             break;
         }
+
+        if (sender.Length == 0)
+        {
+            Console.WriteLine("Sender cannot be empty.");
+            continue;
+        }
+
+        Console.Write("Message: ");
+
+        string messageBody =
+            Console.ReadLine()?.Trim()
+            ?? string.Empty;
 
         if (messageBody.Length == 0)
         {
@@ -80,10 +93,20 @@ try
             continue;
         }
 
+        SmsPayload smsPayload = new()
+        {
+            Sender = sender,
+            Body = messageBody,
+            ReceivedAt = DateTimeOffset.Now
+        };
+
+        string serializedPayload =
+            JsonSerializer.Serialize(smsPayload);
+
         RelayMessageEnvelope envelope = new()
         {
             ChannelId = channelId,
-            Payload = messageBody,
+            Payload = serializedPayload,
             SentAt = DateTimeOffset.UtcNow
         };
 
@@ -92,6 +115,7 @@ try
             envelope);
 
         Console.WriteLine("Message sent.");
+        Console.WriteLine();
     }
 }
 catch (Exception exception)
