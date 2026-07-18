@@ -28,6 +28,16 @@
                 Text="Connect"
                 Clicked="OnConnectClicked" />
 
+            <Button
+                x:Name="EnableSmsButton"
+                Text="Enable SMS forwarding"
+                Clicked="OnEnableSmsClicked" />
+
+            <Label
+                x:Name="SmsPermissionLabel"
+                Text="SMS access is not enabled"
+                HorizontalOptions="Center" />
+
             <Entry
                 x:Name="SenderEntry"
                 Placeholder="Sender"

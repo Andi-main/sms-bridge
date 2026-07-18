@@ -30,18 +30,21 @@ public sealed class RelayConnectionService : IAsyncDisposable
         _connection.Reconnecting += exception =>
         {
             ConnectionStatusChanged?.Invoke("Reconnecting");
+
             return Task.CompletedTask;
         };
 
         _connection.Reconnected += async _ =>
         {
             await JoinChannelAsync(CancellationToken.None);
+
             ConnectionStatusChanged?.Invoke("Connected");
         };
 
         _connection.Closed += exception =>
         {
             ConnectionStatusChanged?.Invoke("Disconnected");
+
             return Task.CompletedTask;
         };
     }
@@ -67,9 +70,22 @@ public sealed class RelayConnectionService : IAsyncDisposable
         ConnectionStatusChanged?.Invoke("Connected");
     }
 
+    public Task SendMessageAsync(
+        string sender,
+        string body,
+        CancellationToken cancellationToken = default)
+    {
+        return SendMessageAsync(
+            sender,
+            body,
+            DateTimeOffset.Now,
+            cancellationToken);
+    }
+
     public async Task SendMessageAsync(
         string sender,
         string body,
+        DateTimeOffset receivedAt,
         CancellationToken cancellationToken = default)
     {
         if (!IsConnected)
@@ -99,13 +115,15 @@ public sealed class RelayConnectionService : IAsyncDisposable
         {
             Sender = normalizedSender,
             Body = normalizedBody,
-            ReceivedAt = DateTimeOffset.Now
+            ReceivedAt = receivedAt
         };
 
         RelayMessageEnvelope envelope = new()
         {
             ChannelId = _channelId,
-            Payload = JsonSerializer.Serialize(payload, JsonOptions),
+            Payload = JsonSerializer.Serialize(
+                payload,
+                JsonOptions),
             SentAt = DateTimeOffset.UtcNow
         };
 
@@ -127,6 +145,7 @@ public sealed class RelayConnectionService : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await _connection.DisposeAsync();
+
         GC.SuppressFinalize(this);
     }
 }

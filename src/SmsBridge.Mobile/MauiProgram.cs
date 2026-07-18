@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using SmsBridge.Mobile.Configuration;
 using SmsBridge.Mobile.Services;
+#if ANDROID
+using SmsBridge.Mobile.Platforms.Android.Services;
+#endif
 
 namespace SmsBridge.Mobile;
 
@@ -19,6 +22,8 @@ public static class MauiProgram
 
         const string relayBaseUrl = "http://localhost:5111";
 
+
+
         builder.Services.AddSingleton(new RelayOptions
         {
             BaseUrl = relayBaseUrl,
@@ -27,6 +32,16 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<RelayConnectionService>();
         builder.Services.AddSingleton<MainPage>();
+
+        builder.Services.AddSingleton<
+    IIncomingMessageForwarder,
+    IncomingMessageForwarder>();
+
+    #if ANDROID
+            builder.Services.AddSingleton<
+                ISmsPermissionService,
+                AndroidSmsPermissionService>();
+    #endif
 
         return builder.Build();
     }

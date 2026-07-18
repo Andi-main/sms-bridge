@@ -6,14 +6,19 @@ public partial class MainPage : ContentPage
 {
     private readonly RelayConnectionService _relayConnection;
 
-    public MainPage(RelayConnectionService relayConnection)
+    public MainPage(
+    RelayConnectionService relayConnection,
+    ISmsPermissionService smsPermissionService)
     {
         InitializeComponent();
 
         _relayConnection = relayConnection;
+        _smsPermissionService = smsPermissionService;
+
         _relayConnection.ConnectionStatusChanged +=
             HandleConnectionStatusChanged;
     }
+
 
     private async void OnConnectClicked(
         object? sender,
@@ -78,5 +83,34 @@ public partial class MainPage : ContentPage
             ConnectButton.IsEnabled = !isConnected;
             SendButton.IsEnabled = isConnected;
         });
+    }
+
+    private readonly ISmsPermissionService
+    _smsPermissionService;
+
+    private async void OnEnableSmsClicked(
+    object? sender,
+    EventArgs eventArgs)
+    {
+        try
+        {
+            EnableSmsButton.IsEnabled = false;
+
+            bool granted =
+                await _smsPermissionService.RequestAsync();
+
+            SmsPermissionLabel.Text = granted
+                ? "SMS forwarding enabled"
+                : "SMS permission denied";
+        }
+        catch (Exception exception)
+        {
+            SmsPermissionLabel.Text =
+                $"Permission request failed: {exception.Message}";
+        }
+        finally
+        {
+            EnableSmsButton.IsEnabled = true;
+        }
     }
 }
