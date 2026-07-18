@@ -4,4 +4,7 @@
     <Project Path="src/SmsBridge.Relay/SmsBridge.Relay.csproj" />
     <Project Path="src/SmsBridge.Shared/SmsBridge.Shared.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/SmsBridge.Simulator/SmsBridge.Simulator.csproj" />
+  </Folder>
 </Solution>
