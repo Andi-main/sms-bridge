@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SmsBridge.Shared\SmsBridge.Shared.csproj" />
+    <ProjectReference Include="..\..\src\SmsBridge.Client.Shared\SmsBridge.Client.Shared.csproj" />
   </ItemGroup>
 
 </Project>

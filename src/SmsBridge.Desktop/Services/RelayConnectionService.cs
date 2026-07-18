@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using SmsBridge.Desktop.Models;
+using SmsBridge.Client.Shared.Messages;
 using SmsBridge.Shared.Messages;
 using System.Text.Json;
-using SmsBridge.Desktop.Contracts;
 namespace SmsBridge.Desktop.Services;
 
 public sealed class RelayConnectionService : BackgroundService, IAsyncDisposable
@@ -116,16 +116,17 @@ public sealed class RelayConnectionService : BackgroundService, IAsyncDisposable
         try
         {
             SmsPayload? payload =
-                JsonSerializer.Deserialize<SmsPayload>(
-                    envelope.Payload);
+            JsonSerializer.Deserialize<SmsPayload>(
+                envelope.Payload);
 
-            string sender =
-                payload?.Sender?.Trim()
-                ?? string.Empty;
+            if (payload is null)
+            {
+                _logger.LogWarning("Received an empty SMS payload from Relay.");
+                return;
+            }
 
-            string body =
-                payload?.Body?.Trim()
-                ?? string.Empty;
+            string sender = payload.Sender.Trim();
+            string body = payload.Body.Trim();
 
             if (sender.Length == 0 || body.Length == 0)
             {
@@ -139,9 +140,9 @@ public sealed class RelayConnectionService : BackgroundService, IAsyncDisposable
             {
                 Sender = sender,
                 Body = body,
-                ReceivedAt =
-                    payload?.ReceivedAt?.LocalDateTime
-                    ?? envelope.SentAt.LocalDateTime
+                ReceivedAt = payload.ReceivedAt == default
+                    ? envelope.SentAt.LocalDateTime
+                    : payload.ReceivedAt.LocalDateTime
             });
         }
         catch (JsonException exception)

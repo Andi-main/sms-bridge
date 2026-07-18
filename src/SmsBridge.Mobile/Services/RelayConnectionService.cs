@@ -2,8 +2,8 @@
 
 using Microsoft.AspNetCore.SignalR.Client;
 
+using SmsBridge.Client.Shared.Messages;
 using SmsBridge.Mobile.Configuration;
-using SmsBridge.Mobile.Models;
 using SmsBridge.Shared.Messages;
 
 namespace SmsBridge.Mobile.Services;

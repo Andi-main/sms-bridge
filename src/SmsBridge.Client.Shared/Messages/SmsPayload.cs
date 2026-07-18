@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SmsBridge.Simulator.Models;
+namespace SmsBridge.Client.Shared.Messages;
 
 public sealed class SmsPayload
 {
