@@ -7,4 +7,7 @@
   <Folder Name="/tools/">
     <Project Path="tools/SmsBridge.Simulator/SmsBridge.Simulator.csproj" />
   </Folder>
+  <Project Path="src/SmsBridge.Mobile/SmsBridge.Mobile.csproj" Id="04e42b3e-feb0-4449-b792-fe9f9b529b85">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

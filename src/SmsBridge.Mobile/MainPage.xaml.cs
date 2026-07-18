@@ -1,23 +1,82 @@
-﻿namespace SmsBridge.Mobile;
+﻿using SmsBridge.Mobile.Services;
+
+namespace SmsBridge.Mobile;
 
 public partial class MainPage : ContentPage
 {
-    int count = 0;
+    private readonly RelayConnectionService _relayConnection;
 
-    public MainPage()
+    public MainPage(RelayConnectionService relayConnection)
     {
         InitializeComponent();
+
+        _relayConnection = relayConnection;
+        _relayConnection.ConnectionStatusChanged +=
+            HandleConnectionStatusChanged;
     }
 
-    private void OnCounterClicked(object? sender, EventArgs e)
+    private async void OnConnectClicked(
+        object? sender,
+        EventArgs eventArgs)
     {
-        count++;
+        try
+        {
+            ConnectButton.IsEnabled = false;
+            ResultLabel.Text = string.Empty;
 
-        if (count == 1)
-            CounterBtn.Text = $"Clicked {count} time";
-        else
-            CounterBtn.Text = $"Clicked {count} times";
+            await _relayConnection.ConnectAsync();
 
-        SemanticScreenReader.Announce(CounterBtn.Text);
+            SendButton.IsEnabled =
+                _relayConnection.IsConnected;
+        }
+        catch (Exception exception)
+        {
+            ResultLabel.Text =
+                $"Connection failed: {exception.Message}";
+
+            ConnectButton.IsEnabled = true;
+        }
+    }
+
+    private async void OnSendClicked(
+    object? sender,
+    EventArgs eventArgs)
+    {
+        try
+        {
+            SendButton.IsEnabled = false;
+            ResultLabel.Text = string.Empty;
+
+            await _relayConnection.SendMessageAsync(
+                SenderEntry.Text ?? string.Empty,
+                MessageEditor.Text ?? string.Empty);
+
+            ResultLabel.Text = "Message sent.";
+            MessageEditor.Text = string.Empty;
+        }
+        catch (Exception exception)
+        {
+            ResultLabel.Text =
+                $"Sending failed: {exception.Message}";
+        }
+        finally
+        {
+            SendButton.IsEnabled =
+                _relayConnection.IsConnected;
+        }
+    }
+
+    private void HandleConnectionStatusChanged(string status)
+    {
+        Dispatcher.Dispatch(() =>
+        {
+            StatusLabel.Text = status;
+
+            bool isConnected =
+                _relayConnection.IsConnected;
+
+            ConnectButton.IsEnabled = !isConnected;
+            SendButton.IsEnabled = isConnected;
+        });
     }
 }
