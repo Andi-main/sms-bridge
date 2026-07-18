@@ -17,14 +17,7 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        #if DEBUG
-		    builder.Logging.AddDebug();
-        #endif
-        #if ANDROID
-            const string relayBaseUrl = "http://10.0.2.2:5111";
-        #else
-            const string relayBaseUrl = "http://localhost:5111";
-        #endif
+        const string relayBaseUrl = "http://localhost:5111";
 
         builder.Services.AddSingleton(new RelayOptions
         {
