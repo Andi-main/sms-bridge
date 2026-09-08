@@ -22,7 +22,7 @@ Relay Server
 Android Client
       |
       v
-SMS
+     SMS
 ```
 
 Komunikacja z relayem wykorzystuje SignalR.
