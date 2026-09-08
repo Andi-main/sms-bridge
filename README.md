@@ -12,7 +12,7 @@ Projekt składa się z kilku współpracujących komponentów:
 
 ## Jak to działa
 
-Desktop Client
+`Desktop Client
     |
     v
 Relay Server
@@ -21,7 +21,7 @@ Relay Server
 Android Client
     |
     v
-SMS
+SMS`
 
 Komunikacja z relayem wykorzystuje SignalR.
 
